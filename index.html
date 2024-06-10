@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Emulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: #61dafb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #terminal {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #output {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal">
+        <div id="output"></div>
+        <input type="text" id="command" placeholder="Enter command" autofocus>
+    </div>
+
+    <script>
+        document.getElementById('command').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const command = this.value;
+                this.value = '';
+                fetch('execute.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'command=' + encodeURIComponent(command)
+                })
+                .then(response => response.text())
+                .then(data => {
+                    const output = document.getElementById('output');
+                    output.textContent += '> ' + command + '\n' + data + '\n';
+                    output.scrollTop = output.scrollHeight;
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
+</body>
+</html>
